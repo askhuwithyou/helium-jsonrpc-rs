@@ -13,6 +13,11 @@ pub struct BlockRaw {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+/// Represents a block response from blockchain-node.
+pub struct HeightRaw {
+    pub height: u64,
+}
+#[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents transaction in 'block_height' response from blockchain-node
 pub struct BlockTransaction {
     pub hash: String,
@@ -47,10 +52,15 @@ pub struct Block {
 
 /// Get the current height of the blockchain
 pub async fn height(client: &Client) -> Result<u64> {
+    let myheight = get_height(client).await?;
+    Ok(myheight.height)
+}
+
+/// Get the current height of the blockchain
+pub async fn get_height(client: &Client) -> Result<HeightRaw> {
     let json = json!(NodeCall::height());
     client.post("/", &json).await
 }
-
 /// Gets a full block (with complete transactions) at a specific block height.
 pub async fn get(client: &Client, height: &u64) -> Result<Block> {
     let raw = get_raw(client, height).await?;
